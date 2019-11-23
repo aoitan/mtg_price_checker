@@ -219,6 +219,9 @@ func priceShopHandler(w http.ResponseWriter, r *http.Request) {
 
   fmt.Println(output)
   fmt.Println(query_string)
+
+  w.Header().Set("Content-Type", "text/plain")
+  w.WriteHeader(http.StatusOK)
   fmt.Fprint(w, output)
 }
 
