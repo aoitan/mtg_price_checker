@@ -127,6 +127,8 @@ type ShopPrice struct {
   LastCheck time.Time
 }
 
+// ToDo: 自前DB -> Wisdom Guildの順で問い合わせる
+// ToDo: Wisdom Guildへの問い合わせをメソッド化する
 func priceShopHandler(w http.ResponseWriter, r *http.Request) {
   if strings.Index(r.URL.Path, "/v1/price/shop") == -1 {
     http.NotFound(w, r)
@@ -200,6 +202,7 @@ func priceShopHandler(w http.ResponseWriter, r *http.Request) {
   })
 
   // 配列から特定ショップをフィルタ
+  // ToDo: 対応するショップはリスト化してリストに含まれているかで判定する
   filtered, _ := funk.Filter(raw_data, func (price ShopPrice) bool {
     return price.ShopName == "晴れる屋" || price.ShopName == "Cardshop Serra" || price.ShopName == "カードラッシュ" || price.ShopName == "トレトク" || price.ShopName == "ENNDAL GAMES" || price.ShopName == "ドラゴンスター"
   }).([]ShopPrice)
@@ -214,7 +217,7 @@ func priceShopHandler(w http.ResponseWriter, r *http.Request) {
     }
   }
 
-  // カード名,晴れる屋,Cardshop Serra,カードラッシュ,トレトク,ENNDAL GAMES,ドラゴンスターのCSVにする
+  // カード名,晴れる屋,Cardshop Serra,カードラッシュ,トレトク,ENNDAL GAMES,ドラゴンスターのTSVにする
   output := fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s", vars["cardname"], unique["晴れる屋"].Price, unique["Cardshop Serra"].Price, unique["カードラッシュ"].Price, unique["トレトク"].Price, unique["ENNDAL GAMES"].Price, unique["ドラゴンスター"].Price)
 
   fmt.Println(output)
