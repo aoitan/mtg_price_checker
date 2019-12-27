@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <script>
+function submit() {
+    let cardname = document.getElementById('cardname').value;
+    let xhr = new XMLHttpRequest();
+    xhr.addEventListener('load', () => {
+        let resultArea = document.getElementById('result');
+        resultArea.value += xhr.response + '\n';
+    });
+    xhr.open('GET', 'http://mtg-price-checker.appspot.com/v1/price/shop/' + cardname);
+    xhr.send();
+}
+        </script>
+    </head>
+    <body>
+        <div>
+            カード名<input id="cardname" type="text">
+            <button onclick="submit()">get</button>
+        </div>
+        <div>
+            <textarea id="result">
+            </textarea>
+        </div>
+    </body>
+</html>
