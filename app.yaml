@@ -13,3 +13,10 @@
 # limitations under the License.
 
 runtime: go111
+handlers:
+  - url: /html
+    static_dir: html
+    secure: always
+  - url: /.*
+    script: auto
+    secure: always
