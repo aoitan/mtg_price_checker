@@ -1,26 +1,87 @@
 <html>
     <head>
+        <meta charset="utf-8">
         <script>
-function submit() {
-    let cardname = document.getElementById('cardname').value;
-    let xhr = new XMLHttpRequest();
-    xhr.addEventListener('load', () => {
-        let resultArea = document.getElementById('result');
-        resultArea.value += xhr.response + '\n';
+function sleep(ms) {
+    const p = new Promise((resolve) => {
+        setTimeout(resolve, ms);
     });
-    xhr.open('GET', 'http://mtg-price-checker.appspot.com/v1/price/shop/' + cardname);
-    xhr.send();
+    return p;
+}
+
+function setDisabled(disabled) {
+    const cardnameInput = document.getElementById('cardname');
+    const cardlistInput = document.getElementById('cardlist');
+    const output = document.getElementById('result');
+
+    cardnameInput.disabled = disabled;
+    cardlistInput.disabled = disabled;
+    output.disabled = disabled;
+}
+
+function getPrice(cardname) {
+    const p = new Promise((resolve, reject) => {
+        setDisabled(true);
+
+        const xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', () => {
+            const output = document.getElementById('result');
+            const text = output.value + xhr.response + '\n';
+            output.value = text;
+            output.rows = text.match(/\n/g).length;
+
+            setDisabled(false);
+
+            resolve(xhr.response);
+        });
+        xhr.addEventListener('error',reject);
+        xhr.open('GET', '/v1/price/shop/' + cardname);
+        xhr.send();
+    });
+    return p;
+}
+
+function submit() {
+    const input = document.getElementById('cardname');
+    const cardname = input.value;
+
+    getPrice(cardname);
+}
+
+async function submitList() {
+    const input = document.getElementById('cardlist');
+    const list = input.value.split(/\n/);
+
+    for (let cardname of list) {
+        await getPrice(cardname);
+        await sleep(1000);
+    }
+}
+
+function clearText() {
+    let output = document.getElementById('result');
+    output.value = '';
 }
         </script>
     </head>
     <body>
         <div>
-            カード名<input id="cardname" type="text">
-            <button onclick="submit()">get</button>
+            <label for="cardname">カード名</label><input name="cardname" id="cardname" type="text">
+            <button onclick="submit()">価格を取得</button>
+        </div>
+        <hr>
+        <div>
+            <label for="cardlist">カードリスト</label><br>
+            <textarea name="cardlist" id="cardlist" cols="100"></textarea><br>
+            <button onclick="submitList()">価格を取得</button>
+        </div>
+        <hr>
+        <div>
+            <label for="result">価格</label><br>
+            <textarea name="result" id="result" cols="100"></textarea>
         </div>
         <div>
-            <textarea id="result">
-            </textarea>
+            <button onclick="clearText()">クリア</button>
         </div>
     </body>
 </html>
